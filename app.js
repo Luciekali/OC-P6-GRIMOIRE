@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 
@@ -17,7 +18,7 @@ app.use((req, res, next) => {
 });
 
 // Connexion mongoose : app & base de données MongoDBAtlas
-mongoose.connect('mongodb+srv://luciekalinowski:hmFccJye3vTJ8HrD@cluster0.qkvewoo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+mongoose.connect(process.env.MONGO_URL,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -27,6 +28,24 @@ mongoose.connect('mongodb+srv://luciekalinowski:hmFccJye3vTJ8HrD@cluster0.qkvewo
 
 const Book = require('./models/book');
 const User = require('./models/user');
+
+// Middlewares routes
+//* GET books
+app.get('/api/books', (req, res) => {
+    Book.find()
+        .then(books => res.status(200).json(books))
+        .catch(error => res.status(400).json({ error }));
+});
+
+// * POST book
+app.post('/api/books', (req, res, next) => {
+    const book = new Book({
+        ...req.body
+    });                  // creation book avec données du body
+    book.save()
+        .then(() => res.status(201).json({ message: 'Livre créé !' }))
+        .catch(error => res.status(400).json({ error }));
+})
 
 // Export de l'app Express
 module.exports = app;

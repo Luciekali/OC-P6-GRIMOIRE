@@ -1,8 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-
 const app = express();
+
+// routes 
+const booksRoutes = require('./routes/books.routes');
+const usersRoutes = require('./routes/users.routes');
 
 // Middlewares généreaux
 
@@ -26,26 +29,8 @@ mongoose.connect(process.env.MONGO_URL,
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-const Book = require('./models/book');
-const User = require('./models/user');
-
-// Middlewares routes
-//* GET books
-app.get('/api/books', (req, res) => {
-    Book.find()
-        .then(books => res.status(200).json(books))
-        .catch(error => res.status(400).json({ error }));
-});
-
-// * POST book
-app.post('/api/books', (req, res, next) => {
-    const book = new Book({
-        ...req.body
-    });                  // creation book avec données du body
-    book.save()
-        .then(() => res.status(201).json({ message: 'Livre créé !' }))
-        .catch(error => res.status(400).json({ error }));
-})
+app.use('/api/books', booksRoutes);
+app.use('/api/auth', usersRoutes)
 
 // Export de l'app Express
 module.exports = app;

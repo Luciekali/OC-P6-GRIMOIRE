@@ -8,9 +8,13 @@ exports.getAllBooks = (req, res) => {
 };
 
 exports.createBook = (req, res, next) => {
+    const bookObject = JSON.parse(req.body.book);
+    delete bookObject._userId;             // securité : prendre données du token d'auth plutot que du client 
     const book = new Book({
-        ...req.body
-    });                  // creation book avec données du body
+        ...bookObject,
+        userId: req.auth.userId,
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`  // url pour acceder au fichier 
+    });
     book.save()
         .then(() => res.status(code.CREATED).json({ message: 'Livre créé !' }))
         .catch(error => res.status(code.BAD_REQUEST).json({ error }));

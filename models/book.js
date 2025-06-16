@@ -1,21 +1,22 @@
 const mongoose = require('mongoose');
+const User = require('./user')
 
 const bookSchema = mongoose.Schema({
-    userId: { type: String }, // identifiant MongoDB unique de l'utilisateur qui a créé le livre
-    title: { type: String }, // titre du livre
-    author: { type: String }, // auteur du livre
-    imageUrl: { type: String }, // illustration / couverture du livre
-    year: { type: Number }, // année de publication du livre
-    genre: { type: String }, //genre du livre
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    title: { type: String },
+    author: { type: String },
+    imageUrl: { type: String },
+    year: { type: Number },
+    genre: { type: String },
 
     ratings: [
         {
-            userId: { type: String }, // identifiant MongoDB unique de l'utilisateur qui a noté le livre
-            grade: { type: Number }, // note donnée à un livre 
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            grade: { type: Number, min: 0, max: 5, },
 
         }
     ],// - notes données à un livre
-    averageRating: { type: Number }, // note moyenne du livre
+    averageRating: { type: Number, default: 0 }, // note moyenne du livre
 })
 
 module.exports = mongoose.model('Book', bookSchema);

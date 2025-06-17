@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 const User = require('./user')
 
+const uniqueValidator = require('mongoose-unique-validator');
+
 const bookSchema = mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    title: { type: String },
+    title: { type: String, unique: true },
     author: { type: String },
     imageUrl: { type: String },
     year: { type: Number },
@@ -11,7 +13,7 @@ const bookSchema = mongoose.Schema({
 
     ratings: [
         {
-            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true },
             grade: { type: Number, min: 0, max: 5, },
 
         }
@@ -19,4 +21,5 @@ const bookSchema = mongoose.Schema({
     averageRating: { type: Number, default: 0 }, // note moyenne du livre
 })
 
+bookSchema.plugin(uniqueValidator);
 module.exports = mongoose.model('Book', bookSchema);

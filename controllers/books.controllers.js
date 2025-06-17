@@ -15,9 +15,20 @@ exports.createBook = (req, res, next) => {
         userId: req.auth.userId,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`  // url pour acceder au fichier 
     });
+
     book.save()
         .then(() => res.status(code.CREATED).json({ message: 'Livre créé !' }))
-        .catch(error => res.status(code.BAD_REQUEST).json({ error }));
+        .catch((error) => {               // Capture erreur en cas de doublon dans titre du livre
+            if (error.code === 11000) {
+                res.status(code.CONFLICT).json({ message: 'Le livre existe déjà.' });
+            }
+            else if (error.name === 'ValidationError') {
+                res.status(code.CONFLICT).json({ message: 'Le livre existe déjà.' });
+            }
+            else {
+                res.status(code.BAD_REQUEST).json({ error });
+            }
+        })
 }
 
 exports.getOneBook = (req, res) => {

@@ -13,7 +13,7 @@ const bookSchema = mongoose.Schema({
 
     ratings: [
         {
-            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true },
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', },
             grade: { type: Number, min: 0, max: 5, },
 
         }

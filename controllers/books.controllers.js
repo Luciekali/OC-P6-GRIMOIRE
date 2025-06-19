@@ -38,7 +38,7 @@ exports.getOneBook = (req, res) => {
 }
 
 exports.modifyBook = (req, res) => {
-    const bookObject = req.file ? {
+    const bookObject = req.file ? { // si il y a img, genere l'url
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
@@ -57,4 +57,36 @@ exports.modifyBook = (req, res) => {
         })
         .catch(error => res.status(code.BAD_REQUEST).json({ error }));
 };
+
+exports.addRating = (req, res) => {
+    // cherche livre et verifie que l'user n'ait pas déjà évalué le livre 
+    Book.findOne({ _id: req.params.id })
+        .then((book) => {
+            if (!book) {
+                return res.status(404).json({ message: 'Livre non trouvé' });
+            }
+            const allReadyRated = book.ratings.find(r => r.userId === req.auth.userId);
+
+            if (allReadyRated) {
+                res.status(code.CONFLICT).json({ message: 'livre déjà évalué' })
+            }
+
+            //ajoute la note + son user et met a jour la moyenne si reussite
+            const updateAverage = req.averageRating;
+
+            Book.updateOne({ _id: req.params.id },
+                {
+                    $push: { ratings: { userId: req.auth.userId, grade: req.body.grade } },
+                    $set: { averageRating: updateAverage }
+                }
+            )
+                .then(() => res.status(code.OK).json({ message: 'note ajoutée et maj moyenne !' }))
+                .catch(error => res.status(code.BAD_REQUEST).json({ error }));
+
+        })
+        .catch(error => res.status(code.BAD_REQUEST).json({ error }));
+};
+
+
+
 

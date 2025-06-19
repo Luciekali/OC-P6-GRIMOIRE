@@ -74,13 +74,14 @@ exports.addRating = (req, res) => {
             //ajoute la note + son user et met a jour la moyenne si reussite
             const updateAverage = req.averageRating;
 
-            Book.updateOne({ _id: req.params.id },
+            Book.findByIdAndUpdate(req.params.id,
                 {
                     $push: { ratings: { userId: req.auth.userId, grade: req.body.grade } },
                     $set: { averageRating: updateAverage }
-                }
+                },
+                { new: true }
             )
-                .then(() => res.status(code.OK).json({ message: 'note ajoutée et maj moyenne !' }))
+                .then((updatedBook) => res.status(code.OK).json(updatedBook))
                 .catch(error => res.status(code.BAD_REQUEST).json({ error }));
 
         })

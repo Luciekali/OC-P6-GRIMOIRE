@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
+const handleMulterError = require('./middleware/handleMulterError');
 
 //    * CORS
 app.use((req, res, next) => {
@@ -35,6 +36,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', usersRoutes);
 
+app.use(handleMulterError);
 
 // Export de l'app Express
 module.exports = app;

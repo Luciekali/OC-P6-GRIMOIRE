@@ -4,6 +4,8 @@ const { default: code } = require('http-status');
 const webToken = require('jsonwebtoken');
 
 exports.signUp = (req, res) => {
+    // hash le mdp 
+    // creer et sauvegarde new user
     const ROUNDS = 10
     bcrypt.hash(req.body.password, ROUNDS)
         .then(hash => {
@@ -19,6 +21,8 @@ exports.signUp = (req, res) => {
 };
 
 exports.login = (req, res) => {
+    // compare le mdp hashé avec celui de la req
+    // si ok : renvoit userId + token crypté
     User.findOne({ email: req.body.email })
         .then(user => {
             if (user === null) {
@@ -27,7 +31,7 @@ exports.login = (req, res) => {
                 bcrypt.compare(req.body.password, user.password)
                     .then(valid => {
                         if (!valid) {
-                            res.status(code.UNAUTHORIZED).json({ message: 'identifiant/mot de passe incorrect' });
+                            return res.status(code.UNAUTHORIZED).json({ message: 'identifiant/mot de passe incorrect' });
                         } else {
                             res.status(code.OK).json({
                                 userId: user._id,

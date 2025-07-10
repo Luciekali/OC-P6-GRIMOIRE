@@ -5,11 +5,11 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const bookSchema = mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    title: { type: String, unique: true },
-    author: { type: String },
+    title: { type: String, unique: true, required: [true, 'Le titre est requis'], trim: true },
+    author: { type: String, required: [true, "L'auteur est requis"], trim: true },
     imageUrl: { type: String },
-    year: { type: Number },
-    genre: { type: String },
+    year: { type: Number, required: [true, "L'année est requise"], trim: true },
+    genre: { type: String, required: [true, "Le genre est requis"], trim: true },
 
     ratings: [
         {

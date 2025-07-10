@@ -37,8 +37,13 @@ exports.createBook = (req, res, next) => {
             //suppression de l'img du fs
             fs.unlink(`images/${filename}`, () => {
 
-                if (error.name === 'ValidationError') {
+                if (error.code === 11000) {
                     return res.status(httpStatus.CONFLICT).json({ message: 'Le livre existe déjà.' });
+                }
+
+                if (error.name === 'ValidationError') {
+                    const errors = Object.values(error.errors).map(error => error.message);
+                    return res.status(httpStatus.BAD_REQUEST).json({ message: "Le livre est incomplet.", errors });
                 }
                 else {
                     return res.status(httpStatus.BAD_REQUEST).json({ error });
